@@ -3,7 +3,7 @@ const Sequelize = require('sequelize');
 
 require('dotenv').config();
 
-//creadt connetion to our database, pass in your MySQL information
+//create connection to our database, pass in your MySQL information
 const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PW, {
   host: 'localhost',
   dialect: 'mysql',
