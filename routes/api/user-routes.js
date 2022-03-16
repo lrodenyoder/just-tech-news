@@ -46,13 +46,40 @@ router.post('/', (req, res) => {
             console.log(err);
             res.status(500).json(err);
         });
- });
+});
+ 
+//POST is used for login because the request parameter is carried in req.body rather than the URL string with GET (password would be attached to URL as plaintext)
+router.post('/login', (req, res) => {
+    User.findOne({
+        where: {
+            email: req.body.email
+        }
+    })
+        .then(dbUserData => {
+            if (!dbUserData) {
+                res.status(400).json({ message: 'No user found with that email address' });
+                return;
+            }
+
+            //verify user
+            //use user object method to compare plaintext to hashed password
+            const validPassword = dbUserData.checkPassword(req.body.password);
+
+            if (!validPassword) {
+                res.status(400).json({ message: 'Password Incorrect' });
+                return;
+            }
+
+            res.json({user: dbUserData, message: 'You are now logged in' });
+    })
+});
 
 //put /api/users/1
 router.put('/:id', (req, res) => {
   //expects {username: 'username', email: 'email', password: 'password'}
   //if req.body has exact key/value pairs to match model, you can just use `req.body` instead
     User.update(req.body, {
+        individualHooks: true,
         where: {
             id: req.params.id
         }
