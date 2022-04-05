@@ -108,12 +108,20 @@ router.post('/', (req, res) => {
 //put before /:id PUT route, otherwise Express will think 'upvote' is a valid parameter for /:id
 //each use can only upvote a post once
 router.put('/upvote', (req, res) => {
-    Post.upvote(req.body, { Vote })
-        .then(updatedPostData => res.json(updatedPostData))
-        .catch(err => {
-            console.error(err);
-            res.status(500).json(err);
-    })
+  // make sure the session exists first
+  if (req.session) {
+    // pass session id along with all destructured properties on req.body
+    Post.upvote(
+      //using saved user_id info from session. Upvote will only work if a user is logged in
+      { ...req.body, user_id: req.session.user_id },
+      { Vote, Comment, User }
+    )
+      .then((updatedVoteData) => res.json(updatedVoteData))
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json(err);
+      });
+  }
 }),
 
 router.put('/:id', (req, res) => {
