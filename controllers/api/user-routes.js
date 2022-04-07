@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { User, Post, Vote, Comment } = require('../../models');
+const withAuth = require('../../utils/auth');
 
 //get /api/users
 router.get('/', (req, res) => { 
@@ -54,7 +55,7 @@ router.get('/:id', (req, res) => {
  });
 
 //post /api/users
-router.post('/', (req, res) => {
+router.post('/', withAuth, (req, res) => {
     //expects {username: 'username', email: 'email', password: 'password'}
     User.create({
       username: req.body.username,
@@ -77,7 +78,7 @@ router.post('/', (req, res) => {
 });
  
 //POST is used for login because the request parameter is carried in req.body rather than the URL string with GET (password would be attached to URL as plaintext)
-router.post('/login', (req, res) => {
+router.post('/login', withAuth, (req, res) => {
     User.findOne({
         where: {
             email: req.body.email
@@ -110,7 +111,7 @@ router.post('/login', (req, res) => {
 });
 
 //put /api/users/1
-router.put('/:id', (req, res) => {
+router.put('/:id', withAuth, (req, res) => {
   //expects {username: 'username', email: 'email', password: 'password'}
   //if req.body has exact key/value pairs to match model, you can just use `req.body` instead
     User.update(req.body, {
@@ -132,7 +133,7 @@ router.put('/:id', (req, res) => {
 });
 
 //delete /api/users/1
-router.delete('/:id', (req, res) => {
+router.delete('/:id', withAuth, (req, res) => {
     User.destroy({
         where: { id: req.params.id }
     })
